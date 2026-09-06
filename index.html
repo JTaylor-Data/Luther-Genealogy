@@ -353,7 +353,6 @@
   </div>
   <div class="panel modesw">
     <button id="m-main" class="on">Sheet tree</button>
-    <button id="m-stage">Reference</button>
   </div>
   <div class="panel" id="searchwrap">
     <div id="searchrow">
@@ -1832,8 +1831,6 @@ function setMode(m, keepView){
   lineage = false; selected = null;
   closeDrawer();
   document.getElementById('m-main').classList.toggle('on', m === 'main');
-  document.getElementById('m-stage').classList.toggle('on', m === 'stage');
-  document.getElementById('banner').classList.toggle('on', m === 'stage');
   document.body.classList.toggle('stagemode', m === 'stage');
   document.getElementById('btn-refresh').style.display = (m === 'main' ? '' : 'none');
   document.getElementById('btn-add').style.display = (m === 'main' ? '' : 'none');
@@ -1853,11 +1850,7 @@ document.getElementById('m-main').onclick = () => {
   if(!mainPeople.length){ document.getElementById('gate').classList.remove('off'); return; }
   if(mode !== 'main') setMode('main');
 };
-document.getElementById('m-stage').onclick = () => { if(mode !== 'stage') setMode('stage'); };
-document.getElementById('bexit').onclick = () => {
-  if(!mainPeople.length){ document.getElementById('gate').classList.remove('off'); return; }
-  setMode('main');
-};
+/* m-stage and bexit removed with Reference View */
 document.getElementById('btn-refresh').onclick = async () => {
   if(!Auth.token){ document.getElementById('gate').classList.remove('off'); return; }
   toast('Re-reading the sheet…');
@@ -2194,11 +2187,7 @@ document.getElementById('btn-clear').onclick = clearAll;
 document.getElementById('gsheet').textContent = CFG.sheetId;
 document.getElementById('gtab').textContent = CFG.tab;
 document.getElementById('gsign').onclick = signIn;
-document.getElementById('gstage').onclick = () => {
-  document.getElementById('gate').classList.add('off');
-  setMode('stage');
-  toast('Reference view — nothing here is in the sheet until you push it');
-};
+/* gstage removed with Reference View */
 
 /* nothing is drawn until either the sheet loads or the reference view is opened */
 people = []; reindex(); render(); apply();
