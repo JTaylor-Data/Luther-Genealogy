@@ -335,7 +335,6 @@
     <div id="gstatus" class="gstatus">Waiting for Google sign-in to load…</div>
     <div class="growl">
       <button class="btn primary" id="gsign" disabled>Sign in with Google</button>
-      <button class="btn" id="gstage">Browse the inferred reference instead</button>
     </div>
     <dl class="gmeta">
       <dt>Sheet</dt><dd id="gsheet"></dd>
@@ -346,7 +345,6 @@
   </div>
 </div>
 
-<div id="banner"><b>Inferred reference</b><span>positions worked out from the original workbook — not in the sheet</span><button class="btn" id="bexit">Back to the sheet tree</button></div>
 
 <div id="topbar">
   <div class="panel" id="brand">
@@ -472,7 +470,8 @@ const SHEET_COLS = [
   ['last','Surname'], ['maiden','Maiden Name'], ['dob','Date of Birth'], ['pob','Place of Birth'],
   ['profession','Profession'], ['dom','Date of Marriage'], ['nchildren','# of Children'],
   ['dod','Date of Death'], ['pod','Place of Death'], ['burial','Burial Location'],
-  ['cause','Cause of Death'], ['viaCode','Via Spouse'], ['deleted','Deleted'], ['history','History']
+  ['cause','Cause of Death'], ['viaCode','Via Spouse'], ['deleted','Deleted'], ['history','History'],
+  ['sex','Sex']
 ];
 let COLIX = {}, NCOLS = 17;
 const normHead = s => String(s||'').toLowerCase().replace(/[^a-z0-9#]/g,'');
@@ -577,9 +576,9 @@ function buildFromSheet(rows){
       _spouseOf: pc.spouse ? pc.partnerCode : null, _parentCode: pc.parentCode
     };
     if(person.placeholder) person.display = 'Unnamed · ' + rec.code;
-    /* sex: maiden name is the strongest signal the sheet carries; the reference
-       reading fills the rest where the code matches. */
-    if(rec.maiden && rec.maiden !== '---' && !/^none$/i.test(rec.maiden)) person.sex = 'F';
+    /* sex: explicit Sex column wins; maiden name is the fallback heuristic. */
+    if(rec.sex && /^[MFU]$/i.test(rec.sex)) person.sex = rec.sex.toUpperCase();
+    else if(rec.maiden && rec.maiden !== '---' && !/^none$/i.test(rec.maiden)) person.sex = 'F';
     else if(rec.maiden === '---') person.sex = 'M';
     if(person.sex === 'U' && ref && ref.sex) person.sex = ref.sex;
     const gsheet = parseInt(rec.generation, 10);
@@ -703,7 +702,7 @@ async function loadSheet(){
     sheetLoadedAt = new Date();
     if(!mainPeople.length){
       gclass('err');
-      gstatus('The tab read fine (' + (rows.length-1) + ' rows) but not one row has a usable Code, so there is nothing to draw.\nFill in the Code column, or use the reference view.');
+      gstatus('The tab read fine (' + (rows.length-1) + ' rows) but not one row has a usable Code, so there is nothing to draw.\nFill in the Code column to start drawing the tree.');
       return;
     }
     document.getElementById('gate').classList.add('off');
